@@ -1,11 +1,11 @@
 import Foundation
 
-// MARK: - Протокол сервиса
+// MARK: - Network Service Protocol
 protocol NetworkServiceProtocol: AnyObject {
     func fetchCryptoMetrics(completion: @escaping ([CryptoMetrics]?, Error?) -> Void)
 }
 
-// MARK: - Сервис
+// MARK: - Network Service
 final class NetworkService: NetworkServiceProtocol {
     
     private let baseURL = "https://data.messari.io/api/v1/assets"

@@ -11,6 +11,7 @@ protocol RouterMainProtocol: RouterMain {
     func initialViewController()
     func pushTabBarVC()
     func pushAuthVC()
+    func logOut()
     func showNetworkData(title: String)
     func showAuthErrorAlert(handelr: @escaping()->())
 }
@@ -47,14 +48,16 @@ class Router: RouterMainProtocol {
               let tabbarVC = builder?.createTabbarVC(router: self) else {
             return
         }
-        
+
         navigationController = UINavigationController(rootViewController: tabbarVC)
+        navigationController.setNavigationBarHidden(true, animated: true)
         sceneDelegate.window?.rootViewController = navigationController
         sceneDelegate.window?.makeKeyAndVisible()
     }
     
     //MARK: - Push Auth View Controller
     func pushAuthVC() {
+        userDefaults.setAuthorizationStatus(false)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let sceneDelegate = windowScene.delegate as? SceneDelegate,
               let tabbarVC = builder?.createAuthVC(router: self) else {
@@ -62,6 +65,20 @@ class Router: RouterMainProtocol {
         }
         
         navigationController = UINavigationController(rootViewController: tabbarVC)
+        navigationController.setNavigationBarHidden(true, animated: true)
+        sceneDelegate.window?.rootViewController = navigationController
+        sceneDelegate.window?.makeKeyAndVisible()
+    }
+    
+    func logOut() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let sceneDelegate = windowScene.delegate as? SceneDelegate,
+              let tabbarVC = builder?.createAuthVC(router: self) else {
+            return
+        }
+        
+        navigationController = UINavigationController(rootViewController: tabbarVC)
+        navigationController.setNavigationBarHidden(true, animated: true)
         sceneDelegate.window?.rootViewController = navigationController
         sceneDelegate.window?.makeKeyAndVisible()
     }
