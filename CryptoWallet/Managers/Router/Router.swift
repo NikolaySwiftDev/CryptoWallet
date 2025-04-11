@@ -11,7 +11,9 @@ protocol RouterMainProtocol: RouterMain {
     func initialViewController()
     func pushTabBarVC()
     func pushAuthVC()
+    func pushDetailVC(model: CryptoMetrics)
     func logOut()
+    func popVC()
     func showNetworkData(title: String)
     func showAuthErrorAlert(handelr: @escaping()->())
 }
@@ -70,6 +72,18 @@ class Router: RouterMainProtocol {
         sceneDelegate.window?.makeKeyAndVisible()
     }
     
+    //MARK: - Push to Detail VC
+    func pushDetailVC(model: CryptoMetrics) {
+        guard let detailVC = builder?.createDetailVC(router: self, model: model) else { return }
+        
+        if let tabBarController = navigationController.topViewController as? UITabBarController {
+            if let selectedNavigationController = tabBarController.selectedViewController as? UINavigationController {
+                selectedNavigationController.pushViewController(detailVC, animated: true)
+            }
+        }
+    }
+
+    //MARK: - Log Out
     func logOut() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let sceneDelegate = windowScene.delegate as? SceneDelegate,
@@ -82,6 +96,18 @@ class Router: RouterMainProtocol {
         sceneDelegate.window?.rootViewController = navigationController
         sceneDelegate.window?.makeKeyAndVisible()
     }
+    
+    //MARK: - Pop VC
+    func popVC() {
+        if let tabBarController = navigationController.topViewController as? UITabBarController {
+            if let selectedNavigationController = tabBarController.selectedViewController as? UINavigationController {
+                selectedNavigationController.popViewController(animated: true)
+            }
+        } else {
+            navigationController.popViewController(animated: true)
+        }
+    }
+
     
     //MARK: - Show Auth Error Alert
     func showAuthErrorAlert(handelr: @escaping()->()) {
@@ -102,6 +128,7 @@ class Router: RouterMainProtocol {
         navigationController.present(alert, animated: true)
     }
     
+    //MARK: - Show Networ kData
     func showNetworkData(title: String) {
         let alert = UIAlertController(title: title,
                                       message: nil,

@@ -18,7 +18,7 @@ class TabBarViewController: UITabBarController {
     }
 
     //MARK: - Generate View Controllers
-    private func generateVC(model: TabBarModel) -> UIViewController {
+    private func generateVC(model: TabBarModel) -> UINavigationController {
         let image = UIImage(named: model.selectedImage)
         let selectedImage = image?
             .withRenderingMode(.alwaysOriginal)
@@ -32,8 +32,11 @@ class TabBarViewController: UITabBarController {
         model.vc.tabBarItem.image = unselectedImage
         model.vc.tabBarItem.selectedImage = selectedImage
         model.vc.tabBarItem.imageInsets = UIEdgeInsets(top: 8, left: 0, bottom: -8, right: 0)
-
-        return model.vc
+        
+        let navVC = UINavigationController(rootViewController: model.vc)
+        navVC.setNavigationBarHidden(true, animated: true)
+        
+        return navVC
     }
     
     //MARK: - Set TabBar Appearance

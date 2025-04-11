@@ -19,6 +19,8 @@ final class NetworkService: NetworkServiceProtocol {
         for symbol in symbols {
             guard let url = URL(string: "\(baseURL)/\(symbol)/metrics") else { continue }
             
+//            https://data.messari.io/api/v1/assets/btc/metrics
+
             group.enter()
             session.dataTask(with: url) { data, response, error in
                 defer { group.leave() }

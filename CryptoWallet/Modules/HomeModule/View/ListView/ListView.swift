@@ -14,12 +14,11 @@ final class ListView: UITableView {
     weak var listDelegate: ListViewDelegate?
 
     private let arrayForButtonsMore = [("Update", "update"), ("Exit", "exit")]
-    private let arrayForButtonsFilter = [("Filter 1", ""), ("Filter 2", ""), ("Filter 3", "")]
+    private let arrayForButtonsFilter = [("Text", "textformat.size.larger"), ("Price", "dollarsign"), ("Percent", "percent")]
 
     private var selectedArray: [(String, String)] = []
 
     // MARK: - Init with array type
-
     init(frame: CGRect = .zero, style: UITableView.Style = .plain, type: ListViewType) {
         super.init(frame: frame, style: style)
         delegate = self
@@ -34,7 +33,6 @@ final class ListView: UITableView {
     }
 
     // MARK: - Update data source
-
     func updateDataSource(with type: ListViewType) {
         switch type {
         case .more:
@@ -51,9 +49,11 @@ final class ListView: UITableView {
         clipsToBounds = true
         separatorStyle = .none
         showsVerticalScrollIndicator = false
+        isScrollEnabled = false
     }
 }
 
+//MARK: - UITable View Delegate
 
 extension ListView: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

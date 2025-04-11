@@ -60,7 +60,12 @@ final class ListViewCell: UITableViewCell {
 
     func configure(with text: String, image: String) {
         titleLabel.text = text
-        iconImageView.image = UIImage(named: image)
+        if let image = UIImage(named: image) {
+            iconImageView.image = image
+        } else {
+            iconImageView.image = UIImage(systemName: image)?
+                .withRenderingMode(.alwaysOriginal)
+                .withTintColor(.textDesc)
+        }
     }
-
 }

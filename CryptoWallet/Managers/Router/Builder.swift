@@ -5,6 +5,7 @@ import UIKit
 protocol BuilderProtocol: AnyObject {
     func createTabbarVC(router: RouterMainProtocol) -> UIViewController
     func createAuthVC(router: RouterMainProtocol) -> UIViewController
+    func createDetailVC(router: RouterMainProtocol, model: CryptoMetrics) -> UIViewController
 }
 
 class Builder: BuilderProtocol {
@@ -33,11 +34,12 @@ class Builder: BuilderProtocol {
                                                     ])
         
         let view = TabBarViewController()
-        let presenter = TabBarPresenter(view: view,
-                                        model: tabbarControllers)
+        let presenter = TabBarPresenter(view: view, model: tabbarControllers)
         view.presenter = presenter
+
         return view
     }
+
     
     func createEmptyVC(_ color: UIColor) -> UIViewController {
         let view = UIViewController()
@@ -57,6 +59,13 @@ class Builder: BuilderProtocol {
         let view = HomeViewController()
         let network = NetworkService()
         let presenter = HomePresenter(view: view, router: router, network: network)
+        view.presenter = presenter
+        return view
+    }
+    
+    func createDetailVC(router: RouterMainProtocol, model: CryptoMetrics) -> UIViewController {
+        let view = DetailViewController()
+        let presenter = DetailPresenter(view: view, router: router, model: model)
         view.presenter = presenter
         return view
     }

@@ -10,6 +10,7 @@ final class HomeViewController: UIViewController {
     
     private var nameIsAscending = false
     private var priceIsAscending = false
+    private var percentIsAscending = false
     
     private let titleHome: UILabel = {
         let label = UILabel()
@@ -81,11 +82,11 @@ final class HomeViewController: UIViewController {
         return btn
     }()
    
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tv = UITableView()
-        tv.backgroundColor = .clear
         tv.layer.cornerRadius = 0
         tv.clipsToBounds = true
+        tv.backgroundColor = .clear
         tv.separatorStyle = .none
         tv.showsVerticalScrollIndicator = false
         return tv
@@ -103,6 +104,14 @@ final class HomeViewController: UIViewController {
         return view
     }()
     
+    private let loader: UIActivityIndicatorView = {
+        let loader = UIActivityIndicatorView()
+        loader.startAnimating()
+        loader.style = .large
+        loader.color = .darkBlue
+        return loader
+    }()
+    
     //MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,12 +122,16 @@ final class HomeViewController: UIViewController {
     }
     
     //MARK: - ViewWillAppear
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        moreListView.isHidden = true
+        filterListView.isHidden = true
     }
     
+
     //MARK: - More Button Tapped
     @objc private func moreButtonTapped() {
+        filterListView.isHidden = true
         if moreListView.isHidden {
             moreListView.alpha = 0
             moreListView.transform = CGAffineTransform(translationX: 0, y: -10)
@@ -140,6 +153,7 @@ final class HomeViewController: UIViewController {
 
     //MARK: - Filter Button Tapped
     @objc private func filterButtonTapped() {
+        moreListView.isHidden = true
         if filterListView.isHidden {
             filterListView.alpha = 0
             filterListView.transform = CGAffineTransform(translationX: 0, y: -10)
@@ -179,7 +193,8 @@ extension HomeViewController {
         backView.addSubview(trendingLable)
         backView.addSubview(filterButton)
         backView.addSubview(tableView)
-        
+        backView.addSubview(loader)
+ 
     }
     
     private func configure() {
@@ -249,13 +264,18 @@ extension HomeViewController {
         filterListView.snp.makeConstraints { make in
             make.top.equalTo(filterButton.snp.bottom).offset(10)
             make.trailing.equalToSuperview().offset(-20)
-            make.height.width.equalTo(157)
+            make.height.width.equalTo(153)
         }
-        
+
         tableView.snp.makeConstraints { make in
             make.top.equalTo(filterButton.snp.bottom)
             make.trailing.leading.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().offset(-85)
+        }
+        
+        loader.snp.makeConstraints { make in
+            make.center.equalTo(backView.snp.center)
+            make.width.height.equalTo(150)
         }
     }
 }
@@ -272,22 +292,33 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
                                                                  for: indexPath) as? CryptoTableViewCell else {return UITableViewCell()}
         if let modelData = cryptosData {
             let model = modelData[indexPath.row]
-            cell.configureCell(title: model.name, desc: model.symbol, price: model.marketData.priceUsd ?? 0, percent: "perc", isUp: true)
+            cell.configureCell(title: model.name,
+                               desc: model.symbol,
+                               price: model.marketData.priceUsd ?? 22,
+                               percent: model.marketData.percentChangeLast24Hours ?? 22,
+                               isUp: model.marketData.isUpPercentChangeLast24Hours)
         }
-
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let modelData = cryptosData {
+            let model = modelData[indexPath.row]
+            presenter?.pushDetail(model: model)
+        }
     }
     
     func tableView(_ tableView: UITableView,
                    heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
     }
-    
 }
 
 //MARK: - AuthProtocol
 extension HomeViewController: HomeProtocol {
     func success(array: [CryptoMetrics]) {
+        loader.stopAnimating()
+        loader.isHidden = true
         cryptosData = array
         tableView.reloadData()
     }
@@ -302,6 +333,7 @@ extension HomeViewController: ListViewDelegate {
             switch index {
             case 0:
                 presenter?.fetchCryptoMetrics()
+                moreButtonTapped()
             case 1:
                 presenter?.logOut()
             default:
@@ -312,11 +344,16 @@ extension HomeViewController: ListViewDelegate {
             case 0:
                 nameIsAscending = !nameIsAscending
                 presenter?.filterCryptosData(by: .name(ascending: nameIsAscending))
+                filterButtonTapped()
             case 1:
                 priceIsAscending = !priceIsAscending
                 presenter?.filterCryptosData(by: .price(ascending: priceIsAscending))
+                filterButtonTapped()
             case 2:
-                print("Filter \(index)")
+                percentIsAscending = !percentIsAscending
+                presenter?.filterCryptosData(by: .percent(ascending: percentIsAscending))
+
+                filterButtonTapped()
             default:
                 break
             }

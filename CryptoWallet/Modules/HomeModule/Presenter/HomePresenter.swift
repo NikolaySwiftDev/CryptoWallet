@@ -10,6 +10,7 @@ protocol HomePresenterProtocol: AnyObject {
     func fetchCryptoMetrics()
     func filterCryptosData(by option: SortOption)
     func logOut()
+    func pushDetail(model: CryptoMetrics)
 
     init(view: HomeProtocol, router: RouterMainProtocol, network: NetworkServiceProtocol)
 }
@@ -68,6 +69,12 @@ class HomePresenter: HomePresenterProtocol {
                 let rhs = $1.marketData.priceUsd ?? 0
                 return ascending ? lhs < rhs : lhs > rhs
             }
+        case .percent(ascending: let ascending):
+            sortedData = cryptos.sorted {
+                let lhs = $0.marketData.percentChangeLast24Hours ?? 0
+                let rhs = $1.marketData.percentChangeLast24Hours ?? 0
+                return ascending ? lhs < rhs : lhs > rhs
+            }
         }
 
         self.view?.success(array: sortedData)
@@ -75,6 +82,10 @@ class HomePresenter: HomePresenterProtocol {
     
     func logOut() {
         router?.logOut()
+    }
+    
+    func pushDetail(model: CryptoMetrics) {
+        router?.pushDetailVC(model: model)
     }
     
 }

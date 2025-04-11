@@ -26,25 +26,11 @@ final class CryptoTableViewCell: UITableViewCell {
         return label
     }()
     
-    private let priceLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .darkBlue
-        label.font = UIFont.poppins(weight: .medium, size: 18)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
+    private let priceLabel: UILabel = UILabel.init()
+    private let percentLabel: UILabel = UILabel.init(font: UIFont.poppins(weight: .medium, size: 18))
 
-    private let percentLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .textDesc
-        label.font = UIFont.poppins(weight: .medium, size: 18)
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
-    
     private let checkImage: UIImageView = {
         let image = UIImageView()
-        
         return image
     }()
     
@@ -65,12 +51,12 @@ final class CryptoTableViewCell: UITableViewCell {
     }
 
     //MARK: - Config cell
-    func configureCell(title: String, desc: String, price: Double, percent: String, isUp: Bool) {
+    func configureCell(title: String, desc: String, price: Double, percent: Double, isUp: Bool) {
         
         titleLabel.text = title
         dascrLabel.text = desc
-        priceLabel.text = String("$ \(String(format: "%.2f", price))")
-        percentLabel.text = "\(percent) %"
+        priceLabel.text = price.formatCurrency()
+        percentLabel.text = percent.formatPercent()
         checkImage.image = isUp ? UIImage(systemName: "chevron.up") : UIImage(systemName: "chevron.down")
         checkImage.tintColor = isUp ? .green : .red
     }
