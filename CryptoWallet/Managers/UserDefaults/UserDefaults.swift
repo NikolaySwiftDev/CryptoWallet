@@ -5,6 +5,7 @@ import Foundation
 protocol UserDefaultsProtocol: AnyObject {
     func setAuthorizationStatus(_ isAuthorized: Bool)
     func getAuthorizationStatus() -> Bool
+    func deleteAuthStatus()
 }
 
 final class UserDefaultsManager: UserDefaultsProtocol {
@@ -14,6 +15,10 @@ final class UserDefaultsManager: UserDefaultsProtocol {
     
     func setAuthorizationStatus(_ isAuthorized: Bool) {
         userDefaults.set(isAuthorized, forKey: authorizationKey)
+    }
+    
+    func deleteAuthStatus() {
+        userDefaults.removeObject(forKey: authorizationKey)
     }
     
     func getAuthorizationStatus() -> Bool {

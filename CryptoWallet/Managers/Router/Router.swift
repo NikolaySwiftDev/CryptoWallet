@@ -59,7 +59,6 @@ class Router: RouterMainProtocol {
     
     //MARK: - Push Auth View Controller
     func pushAuthVC() {
-        userDefaults.setAuthorizationStatus(false)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let sceneDelegate = windowScene.delegate as? SceneDelegate,
               let tabbarVC = builder?.createAuthVC(router: self) else {
@@ -85,6 +84,7 @@ class Router: RouterMainProtocol {
 
     //MARK: - Log Out
     func logOut() {
+        userDefaults.setAuthorizationStatus(false)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let sceneDelegate = windowScene.delegate as? SceneDelegate,
               let tabbarVC = builder?.createAuthVC(router: self) else {
