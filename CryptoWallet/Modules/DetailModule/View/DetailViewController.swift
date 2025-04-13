@@ -16,12 +16,12 @@ final class DetailViewController: UIViewController {
     }()
     
     private let titleLabel: UILabel = UILabel.init(font: .poppins(weight: .medium, size: 16),
-                                                        textColor: .blueText)
+                                                   textColor: DetailConstants.textColorBlue)
     
     private let priceLabel: UILabel = UILabel.init(font: .poppins(weight: .medium, size: 28),
-                                                        textColor: .blueText)
+                                                        textColor: DetailConstants.textColorBlue)
     private let percentLabel: UILabel = UILabel.init(font: .poppins(weight: .medium, size: 14),
-                                                          textColor: .blueText)
+                                                          textColor: DetailConstants.textColorBlue)
     private let checkImage = UIImageView()
     
     private let timeIntervalCnage = TimeIntervalView()
@@ -37,20 +37,20 @@ final class DetailViewController: UIViewController {
     
     private let marketStatsLabel: UILabel = UILabel.init(text: "Market Statistic",
                                                               font: .poppins(weight: .medium, size: 20),
-                                                              textColor: .blueText)
+                                                              textColor: DetailConstants.textColorBlue)
     //Market capitalization
     private lazy var marketCapitLabel: UILabel = UILabel.init(text: "Market capitalization",
                                                               font: .poppins(weight: .medium, size: 14),
-                                                              textColor: .textDesc)
+                                                              textColor: DetailConstants.textColorGray)
     private lazy var marketCapitValueLabel: UILabel = UILabel.init(font: .poppins(weight: .semiBold, size: 14),
-                                                                   textColor: .blueText)
+                                                                   textColor: DetailConstants.textColorBlue)
     
     //Circulating Suply
     private lazy var circulatingLabel: UILabel = UILabel.init(text: "Circulating Suply",
                                                               font: .poppins(weight: .medium, size: 14),
-                                                              textColor: .textDesc)
+                                                              textColor: DetailConstants.textColorGray)
     private lazy var circulatingValueLabel: UILabel = UILabel.init(font: .poppins(weight: .semiBold, size: 14),
-                                                                   textColor: .blueText)
+                                                                   textColor: DetailConstants.textColorBlue)
     
     //MARK: - ViewDidLoad
     override func viewDidLoad() {
@@ -93,6 +93,8 @@ final class DetailViewController: UIViewController {
             percentChange = model.roiData.percentChangeLastWeek ?? 0
         case .oneMonth:
             percentChange = model.roiData.percentChangeLastMonth ?? 0
+        case .threeMonth:
+            percentChange = model.roiData.percentChangeLastThreeMonths ?? 0
         case .oneYear:
             percentChange = model.roiData.percentChangeLastYear ?? 0
         }
@@ -106,6 +108,20 @@ final class DetailViewController: UIViewController {
         percentLabel.textColor = isUp ? .systemGreen : .systemRed
     }
 
+}
+
+//MARK: - Time Interval View Delegate
+extension DetailViewController: TimeIntervalViewDelegate {
+    func timeIntervalView(_ view: TimeIntervalView, didSelectInterval interval: Interval) {
+        configLabels(type: interval)
+    }
+}
+
+//MARK: - Detail Protocol
+extension DetailViewController: DetailProtocol {
+    func getModel(model: CryptoMetrics) {
+        self.model = model
+    }
 }
 
 //MARK: - Extension SetupView and SetupContraints
@@ -133,8 +149,8 @@ extension DetailViewController {
     
     private func setupContraints() {
         backButton.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
-            make.leading.equalToSuperview().offset(20)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(DetailConstants.paddingStandart)
+            make.leading.equalToSuperview().offset(DetailConstants.paddingStandart)
             make.height.width.equalTo(56)
         }
         
@@ -144,7 +160,7 @@ extension DetailViewController {
         }
 
         priceLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(20)
+            make.top.equalTo(titleLabel.snp.bottom).offset(DetailConstants.paddingStandart)
             make.centerX.equalToSuperview()
         }
         
@@ -159,8 +175,8 @@ extension DetailViewController {
         }
 
         timeIntervalCnage.snp.makeConstraints { make in
-            make.top.equalTo(percentLabel.snp.bottom).offset(20)
-            make.trailing.leading.equalToSuperview().inset(20)
+            make.top.equalTo(percentLabel.snp.bottom).offset(DetailConstants.paddingStandart)
+            make.trailing.leading.equalToSuperview().inset(DetailConstants.paddingStandart)
             make.height.equalTo(55)
         }
         
@@ -171,42 +187,35 @@ extension DetailViewController {
         }
         
         marketStatsLabel.snp.makeConstraints { make in
-            make.top.equalTo(backView.snp.top).offset(40)
-            make.leading.equalToSuperview().offset(20)
+            make.top.equalTo(backView.snp.top).offset(DetailConstants.paddingStandart * 2)
+            make.leading.equalToSuperview().offset(DetailConstants.paddingStandart)
         }
         
         marketCapitLabel.snp.makeConstraints { make in
-            make.top.equalTo(marketStatsLabel.snp.bottom).offset(20)
-            make.leading.equalToSuperview().offset(20)
+            make.top.equalTo(marketStatsLabel.snp.bottom).offset(DetailConstants.paddingStandart)
+            make.leading.equalToSuperview().offset(DetailConstants.paddingStandart)
         }
         
         circulatingLabel.snp.makeConstraints { make in
-            make.top.equalTo(marketCapitLabel.snp.bottom).offset(20)
-            make.leading.equalToSuperview().offset(20)
+            make.top.equalTo(marketCapitLabel.snp.bottom).offset(DetailConstants.paddingStandart)
+            make.leading.equalToSuperview().offset(DetailConstants.paddingStandart)
         }
         
         marketCapitValueLabel.snp.makeConstraints { make in
             make.centerY.equalTo(marketCapitLabel.snp.centerY)
-            make.trailing.equalToSuperview().offset(-20)
+            make.trailing.equalToSuperview().offset(-DetailConstants.paddingStandart)
         }
         
         circulatingValueLabel.snp.makeConstraints { make in
             make.centerY.equalTo(circulatingLabel.snp.centerY)
-            make.trailing.equalToSuperview().offset(-20)
+            make.trailing.equalToSuperview().offset(-DetailConstants.paddingStandart)
         }
     }
 }
 
-//MARK: - Time Interval View Delegate
-extension DetailViewController: TimeIntervalViewDelegate {
-    func timeIntervalView(_ view: TimeIntervalView, didSelectInterval interval: Interval) {
-        configLabels(type: interval)
-    }
+fileprivate struct DetailConstants {
+    static let textColorBlue: UIColor = .blueText
+    static let textColorGray: UIColor = .textDesc
+    static let paddingStandart: CGFloat = 20
 }
-
-//MARK: - Detail Protocol
-extension DetailViewController: DetailProtocol {
-    func getModel(model: CryptoMetrics) {
-        self.model = model
-    }
-}
+ 

@@ -34,6 +34,23 @@ final class AuthViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         setupContraints()
+        configTextFields()
+    }
+    
+    //MARK: - Config TextFields
+    private func configTextFields() {
+        userTextField.textField.addTarget(self, action: #selector(userTextChanged(_:)), for: .editingChanged)
+        passwordTextField.textField.addTarget(self, action: #selector(passwordTextChanged(_:)), for: .editingChanged)
+    }
+
+    //MARK: - User Text Changed
+    @objc func userTextChanged(_ textField: UITextField) {
+        self.user = textField.text ?? ""
+    }
+
+    //MARK: - Password Text Changed
+    @objc func passwordTextChanged(_ textField: UITextField) {
+        self.password = textField.text ?? ""
     }
     
     //MARK: - Login Button Tapped
@@ -64,7 +81,10 @@ extension AuthViewController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+
 }
+
+
 
 //MARK: - Extension SetupView and SetupContraints
 extension AuthViewController {
@@ -107,7 +127,7 @@ extension AuthViewController {
     }
 }
 
-//MARK: - Tab Bar Constants
+//MARK: - Auth Constants
 fileprivate struct AuthConstants {
     static let backgroundColor = UIColor(.backgrWhite)
     static let loginButtonColor = UIColor(.darkBlue)

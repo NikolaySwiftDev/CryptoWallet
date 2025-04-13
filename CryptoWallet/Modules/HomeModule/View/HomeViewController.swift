@@ -8,7 +8,7 @@ final class HomeViewController: UIViewController {
     var presenter: HomePresenterProtocol?
     var cryptosData: [CryptoMetrics]?
     
-    private var nameIsAscending = false
+    private var nameIsAscending = true
     private var priceIsAscending = false
     private var percentIsAscending = false
     
@@ -119,11 +119,13 @@ final class HomeViewController: UIViewController {
         setupContraints()
         configure()
         presenter?.fetchCryptoMetrics()
+
     }
     
     //MARK: - ViewWillAppear
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        presenter?.fetchCryptoMetrics()
         moreListView.isHidden = true
         filterListView.isHidden = true
     }
@@ -173,6 +175,89 @@ final class HomeViewController: UIViewController {
         }
     }
 
+}
+
+
+//MARK: - UITableViewDelegate
+extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        cryptosData?.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CryptoTableViewCell.cellID,
+                                                                 for: indexPath) as? CryptoTableViewCell else {return UITableViewCell()}
+        if let modelData = cryptosData {
+            let model = modelData[indexPath.row]
+            let image = UIImage(named: model.name.lowercased()) ?? UIImage()
+            cell.configureCell(title: model.name,
+                               desc: model.symbol,
+                               image: image,
+                               price: model.marketData.priceUsd ?? 22,
+                               percent: model.marketData.percentChangeLast24Hours ?? 22,
+                               isUp: model.marketData.isUpPercentChangeLast24Hours)
+        }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let modelData = cryptosData {
+            let model = modelData[indexPath.row]
+            presenter?.pushDetail(model: model)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView,
+                   heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 70
+    }
+}
+
+//MARK: - AuthProtocol
+extension HomeViewController: HomeProtocol {
+    func success(array: [CryptoMetrics]) {
+        loader.stopAnimating()
+        loader.isHidden = true
+        cryptosData = array
+        tableView.reloadData()
+    }
+    
+    func error(error: Error) {}
+}
+
+//MARK: - List View Protocols
+extension HomeViewController: ListViewDelegate {
+    func listView(_ listView: ListView, didSelectItemAt index: Int) {
+        if listView == moreListView {
+            switch index {
+            case 0:
+                presenter?.fetchCryptoMetrics()
+                moreButtonTapped()
+            case 1:
+                presenter?.logOut()
+            default:
+                break
+            }
+        } else {
+            switch index {
+            case 0:
+                nameIsAscending = !nameIsAscending
+                presenter?.filterCryptosData(by: .name(ascending: nameIsAscending))
+                filterButtonTapped()
+            case 1:
+                priceIsAscending = !priceIsAscending
+                presenter?.filterCryptosData(by: .price(ascending: priceIsAscending))
+                filterButtonTapped()
+            case 2:
+                percentIsAscending = !percentIsAscending
+                presenter?.filterCryptosData(by: .percent(ascending: percentIsAscending))
+
+                filterButtonTapped()
+            default:
+                break
+            }
+        }
+    }
 }
 
 //MARK: - Extension SetupView and SetupContraints
@@ -279,84 +364,5 @@ extension HomeViewController {
         }
     }
 }
- 
 
-//MARK: - UITableViewDelegate
-extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cryptosData?.count ?? 0
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CryptoTableViewCell.cellID,
-                                                                 for: indexPath) as? CryptoTableViewCell else {return UITableViewCell()}
-        if let modelData = cryptosData {
-            let model = modelData[indexPath.row]
-            cell.configureCell(title: model.name,
-                               desc: model.symbol,
-                               price: model.marketData.priceUsd ?? 22,
-                               percent: model.marketData.percentChangeLast24Hours ?? 22,
-                               isUp: model.marketData.isUpPercentChangeLast24Hours)
-        }
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let modelData = cryptosData {
-            let model = modelData[indexPath.row]
-            presenter?.pushDetail(model: model)
-        }
-    }
-    
-    func tableView(_ tableView: UITableView,
-                   heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
-    }
-}
-
-//MARK: - AuthProtocol
-extension HomeViewController: HomeProtocol {
-    func success(array: [CryptoMetrics]) {
-        loader.stopAnimating()
-        loader.isHidden = true
-        cryptosData = array
-        tableView.reloadData()
-    }
-    
-    func error(error: Error) {}
-}
-
-//MARK: - List View Protocols
-extension HomeViewController: ListViewDelegate {
-    func listView(_ listView: ListView, didSelectItemAt index: Int) {
-        if listView == moreListView {
-            switch index {
-            case 0:
-                presenter?.fetchCryptoMetrics()
-                moreButtonTapped()
-            case 1:
-                presenter?.logOut()
-            default:
-                break
-            }
-        } else {
-            switch index {
-            case 0:
-                nameIsAscending = !nameIsAscending
-                presenter?.filterCryptosData(by: .name(ascending: nameIsAscending))
-                filterButtonTapped()
-            case 1:
-                priceIsAscending = !priceIsAscending
-                presenter?.filterCryptosData(by: .price(ascending: priceIsAscending))
-                filterButtonTapped()
-            case 2:
-                percentIsAscending = !percentIsAscending
-                presenter?.filterCryptosData(by: .percent(ascending: percentIsAscending))
-
-                filterButtonTapped()
-            default:
-                break
-            }
-        }
-    }
-}
+fileprivate struct HomeConstants {}

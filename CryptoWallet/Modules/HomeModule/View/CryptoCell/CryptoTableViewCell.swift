@@ -51,10 +51,11 @@ final class CryptoTableViewCell: UITableViewCell {
     }
 
     //MARK: - Config cell
-    func configureCell(title: String, desc: String, price: Double, percent: Double, isUp: Bool) {
+    func configureCell(title: String, desc: String, image: UIImage, price: Double, percent: Double, isUp: Bool) {
         
         titleLabel.text = title
         dascrLabel.text = desc
+        cryptoImage.image = image
         priceLabel.text = price.formatCurrency()
         percentLabel.text = percent.formatPercent()
         checkImage.image = isUp ? UIImage(systemName: "chevron.up") : UIImage(systemName: "chevron.down")
